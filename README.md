@@ -16,4 +16,5 @@ JavaScript
 Tailwind CSS
 
 ##Purpose
+
 This project is built to practice React state management, immutable updates, list rendering, conditional UI rendering, and user interaction handling in a real-world checklist scenario.
