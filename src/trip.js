@@ -74,7 +74,7 @@ let data = [
 export function App () {
   const [list, setList] = useState(data)
   return (
-    <div className='flex flex-col items-center  mt-12 border-2 border-purple-600 p-6  w-[75%] max-w-[450px] rounded-xl mx-auto'>
+    <div className='flex flex-col items-center  mt-12 border-2 border-purple-600 p-6  w-[75%] max-w-[450px] rounded-xl mx-auto  '>
       <HeroSection list={list} />
       <Items list={list} onSetList={setList} />
     </div>
@@ -83,11 +83,11 @@ export function App () {
 
 function HeroSection ({ list }) {
   let total = list.reduce((val, e) => val + e.items.length, 0)
-  
-  
-  let done = list.reduce((val,e)=> val+e.items.filter(item => item.checked).length,0)
-  const percent = total > 0 ? Math.round((done / total * 100) ):0
-  console.log(percent)
+
+  let done = list.reduce(
+    (val, e) => val + e.items.filter(item => item.checked).length,
+    0
+  )
 
   return (
     <div className='relative '>
@@ -103,12 +103,15 @@ function HeroSection ({ list }) {
           src='/img/florence.jpg'
           alt='folrence'
         ></img>
-        <div className='flex items-center translate-x-[-50%] left-1/2  absolute -bottom-4 px-4 shadow-md w-[90%]  gap-3 bg-white p-2 rounded-lg '>
-          <span className='text-[12px] text-gray-600'>{total} items</span>
+        <div className='flex items-center translate-x-[-50%] left-1/2  absolute -bottom-5 px-4 shadow-md w-[95%]  gap-3 bg-white p-2 rounded-lg '>
+          <span className='text-[9px] text-gray-600'>{total} items</span>
           <div className='w-full h-2 bg-gray-300 rounded-full '>
-            <div className='w-{} flex-1 h-full bg-purple-600 rounded-full'></div>
+            <div
+              className=' flex-1 h-full bg-purple-600 rounded-full'
+              style={{ width: done * 5.5 }}
+            ></div>
           </div>
-          <span className='text-sm text-gray-600'>0%</span>
+          <span className='text-[9px] text-gray-600'>checked items {done}</span>
         </div>
       </div>
     </div>
@@ -135,19 +138,21 @@ function Items ({ list, onSetList }) {
     setInput('')
   }
 
-  function handleCheckBox (e, index) {
-    const check = list.map(item => {
-      const check2 = item.items.map((value, i) => {
-        if (index === i) {
-          return {
-            ...value,
-            checked: !value.checked
+  function handleCheckBox (e, index, cardIndex) {
+    const check = list.map((item, inx) => {
+      if (cardIndex === inx) {
+        const check2 = item.items.map((value, i) => {
+          if (index === i) {
+            return {
+              ...value,
+              checked: !value.checked
+            }
           }
-        }
-
-        return value
-      })
-      return { ...item, items: check2 }
+          return value
+        })
+        return { ...item, items: check2 }
+      }
+      return item
     })
     onSetList(check)
     console.log(check)
@@ -163,46 +168,50 @@ function Items ({ list, onSetList }) {
   }
   return (
     <div className='mt-8 w-full'>
-      {list.map((item, index) => {
+      {list.map((item, cardIndex) => {
         return (
-          <div key={index} className='shadow-lg p-4 rounded-lg w-full'>
+          <div key={cardIndex} className='shadow-lg p-4 rounded-lg w-full'>
             <h2 className='font-bold flex justify-between mb-4 pr-2'>
               {item.category}
               <div>
                 <span
                   className='cursor-pointer self-end '
-                  onClick={e => handleSort(e, index)}
+                  onClick={e => handleSort(e, cardIndex)}
                 >
                   🔃
                 </span>
                 <span
-                  onClick={() => setOpen(index === open ? null : index)}
+                  onClick={() => setOpen(cardIndex === open ? null : cardIndex)}
                   className='cursor-pointer text-lg '
                 >
-                  {open === index ? '➖' : '➕'}
+                  {open === cardIndex ? '➖' : '➕'}
                 </span>
               </div>
             </h2>
-            {open === index && (
+            {open === cardIndex && (
               <div className='flex flex-col gap-2'>
                 {item.items.map((option, index) => {
                   return (
                     <div
                       key={index}
                       className='flex justify-between p-1 border border-neutral-300 rounded-lg pr-2 pl-2'
+                      style={{
+                        backgroundColor: option.checked && 'silver'
+                      }}
                     >
                       {option.name}
                       <input
                         type='checkbox'
-                        className=''
-                        onChange={e => handleCheckBox(e, index)}
+                        checked={option.checked}
+                        className='accent-slate-800'
+                        onChange={e => handleCheckBox(e, index, cardIndex)}
                       ></input>
                     </div>
                   )
                 })}
                 <form
                   className='relative'
-                  onSubmit={e => handleValue(e, index)}
+                  onSubmit={e => handleValue(e, cardIndex)}
                 >
                   <input
                     value={input}
